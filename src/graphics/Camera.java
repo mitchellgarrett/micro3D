@@ -1,5 +1,6 @@
 package graphics;
 
+import math.Mathf;
 import math.Matrix4;
 
 public class Camera {
@@ -15,7 +16,7 @@ public class Camera {
 	}
 	
 	public Matrix4 getProjectionMatrix() {
-		float f = (float) (1f / Math.tan(fov * 0.5f / 180f * Math.PI));
+		float f = (1f / Mathf.tan(fov * 0.5f / 180f * Mathf.PI));
 		Matrix4 mat = new Matrix4();
 		
 		mat.set(0, 0, aspect * f);

@@ -55,15 +55,19 @@ public class Vector3 {
 	}
 	
 	public Vector3 mul(Matrix4 mat) {
-		x(x() * mat.get(0, 0) + y() * mat.get(1, 0) + z() * mat.get(2, 0) + mat.get(3, 0));
-		y(x() * mat.get(0, 1) + y() * mat.get(1, 1) + z() * mat.get(2, 1) + mat.get(3, 1)); 
-		z(x() * mat.get(0, 2) + y() * mat.get(1, 2) + z() * mat.get(2, 2) + mat.get(3, 2));
+		float x = x() * mat.get(0, 0) + y() * mat.get(1, 0) + z() * mat.get(2, 0) + mat.get(3, 0);
+		float y = x() * mat.get(0, 1) + y() * mat.get(1, 1) + z() * mat.get(2, 1) + mat.get(3, 1); 
+		float z = x() * mat.get(0, 2) + y() * mat.get(1, 2) + z() * mat.get(2, 2) + mat.get(3, 2);
+		
+		values[0] = x;
+		values[1] = y;
+		values[2] = z;
 		
 		float w = x() * mat.get(0, 3) + y() * mat.get(1, 3) + z() * mat.get(2, 3) + mat.get(3, 3);
 		if (w != 0) {
-			x(x() / w);
-			y(y() / w);
-			z(z() / w);
+			values[0] /= w;
+			values[1] /= w;
+			values[2] /= w;
 		}
 		return this;
 	}

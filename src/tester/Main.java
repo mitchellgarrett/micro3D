@@ -8,7 +8,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		Window window = new Window(720, 720, "micro3D");
-		Camera camera = new Camera(window.getAspectRatio(), 60, 0, 5);
+		Camera camera = new Camera(window.getAspectRatio(), 60, 0, 10);
 		
 		Mesh mesh = new Mesh();
 		

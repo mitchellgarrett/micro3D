@@ -2,18 +2,14 @@ package graphics;
 
 import javax.swing.JFrame;
 
-import math.Matrix4;
-import math.Vector3;
-import mesh.Mesh;
-import mesh.Triangle;
+import math.*;
+import mesh.*;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferStrategy;
 
 public class Window {
 	
@@ -63,10 +59,10 @@ public class Window {
 		theta += deltaTime * 0.1f;
 		Matrix4 rot = new Matrix4();
 		rot.set(0, 0, 1);
-		rot.set(1, 1, (float) Math.cos(theta * 0.5f));
-		rot.set(1, 2, (float) Math.sin(theta * 0.5f));
-		rot.set(2, 1, (float) -Math.sin(theta * 0.5f));
-		rot.set(2, 2, (float) Math.cos(theta * 0.5f));
+		rot.set(1, 1,  Mathf.cos(theta * 0.5f));
+		rot.set(1, 2, Mathf.sin(theta * 0.5f));
+		rot.set(2, 1, -Mathf.sin(theta * 0.5f));
+		rot.set(2, 2, Mathf.cos(theta * 0.5f));
 		rot.set(3, 3, 1);
 		/*rot.set(0, 0, (float) Math.cos(theta));
 		rot.set(0, 1, (float) Math.sin(theta));
