@@ -10,4 +10,6 @@ public class Mathf {
 	public static float sin(float r) { return (float) Math.sin(r); }
 	public static float cos(float r) { return (float) Math.cos(r); }
 	public static float tan(float r) { return (float) Math.tan(r); }
+	
+	public static float sqrt(float v) { return (float) Math.sqrt(v); }
 }

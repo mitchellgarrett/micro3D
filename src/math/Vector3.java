@@ -33,10 +33,42 @@ public class Vector3 {
 	public float y(float val) { return values[1] = val; }
 	public float z(float val) { return values[2] = val; }
 	
+	public float dot(Vector3 val) {
+		return x() * val.x() + y() * val.y() + z() * val.z();
+	}
+	
+	public Vector3 cross(Vector3 val) {
+		float x = y() * val.z() - z() * val.y();
+		float y = z() * val.x() - x() * val.z();
+		float z = x() * val.y() - y() * val.x();
+		
+		values[0] = x;
+		values[1] = y;
+		values[2] = z;
+		
+		return this;
+	}
+	
+	public float length() {
+		return Mathf.sqrt(x() * x() + y() * y() + z() * z());
+	}
+	
+	public Vector3 normalize() {
+		div(length());
+		return this;
+	}
+	
 	public Vector3 add(Vector3 val) {
 		values[0] += val.x();
 		values[1] += val.y();
 		values[2] += val.z();
+		return this;
+	}
+	
+	public Vector3 sub(Vector3 val) {
+		values[0] -= val.x();
+		values[1] -= val.y();
+		values[2] -= val.z();
 		return this;
 	}
 	
@@ -70,5 +102,17 @@ public class Vector3 {
 			values[2] /= w;
 		}
 		return this;
+	}
+	
+	public Vector3 div(float val) {
+		values[0] /= val;
+		values[1] /= val;
+		values[2] /= val;
+		return this;
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + x() + ", " + y() + ", " + z() + ")";
 	}
 }
