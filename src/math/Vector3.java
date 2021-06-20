@@ -33,6 +33,10 @@ public class Vector3 {
 	public float y(float val) { return values[1] = val; }
 	public float z(float val) { return values[2] = val; }
 	
+	public Vector3 copy() {
+		return new Vector3(this);
+	}
+	
 	public float dot(Vector3 val) {
 		return x() * val.x() + y() * val.y() + z() * val.z();
 	}

@@ -3,7 +3,7 @@ package entity;
 import math.Mathf;
 import math.Matrix4;
 
-public class Camera {
+public class Camera extends Entity {
 	
 	float aspect, fov;
 	float near, far;
@@ -11,7 +11,7 @@ public class Camera {
 	Transform transform;
 	
 	public Camera(float aspect, float fov, float near, float far) {
-		transform = new Transform();
+		super();
 		this.aspect = aspect;
 		this.fov = fov;
 		this.near = near;
@@ -31,8 +31,6 @@ public class Camera {
 		
 		return mat;
 	}
-	
-	public Transform transform() { return transform; }
 	
 	public void setAspect(float aspect) { this.aspect = aspect; }
 }

@@ -20,6 +20,14 @@ public class Vector4 {
 		values[3] = w;
 	}
 	
+	public Vector4(Vector4 val) {
+		values = new float[3];
+		values[0] = val.x();
+		values[1] = val.y();
+		values[2] = val.z();
+		values[3] = val.w();
+	}
+	
 	public float x() { return values[0]; }
 	public float y() { return values[1]; }
 	public float z() { return values[2]; }
@@ -29,6 +37,10 @@ public class Vector4 {
 	public float y(float val) { return values[1] = val; }
 	public float z(float val) { return values[2] = val; }
 	public float w(float val) { return values[3] = val; }
+	
+	public Vector4 copy() {
+		return new Vector4(this);
+	}
 	
 	public Vector4 mul(Matrix4 mat) {
 		return new Vector4(

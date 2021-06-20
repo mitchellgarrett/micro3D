@@ -12,4 +12,8 @@ public class Mathf {
 	public static float tan(float r) { return (float) Math.tan(r); }
 	
 	public static float sqrt(float v) { return (float) Math.sqrt(v); }
+	
+	public static Vector3 normal(Vector3 a, Vector3 b, Vector3 c) {
+		return b.copy().sub(a).cross(c.copy().sub(a)).normalize();
+	}
 }

@@ -1,6 +1,6 @@
 package tester;
 
-import entity.Camera;
+import entity.*;
 import graphics.*;
 import mesh.*;
 
@@ -11,6 +11,7 @@ public class Main {
 		Camera camera = new Camera(window.getAspectRatio(), 60, 0, 100);
 		
 		Mesh mesh = MeshLoader.loadMesh("res/cube.obj");
+		//mesh.calculateNormals();
 		
 		window.mesh = mesh;
 		window.camera = camera;
