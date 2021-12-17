@@ -1,8 +1,8 @@
-package entity;
+package component;
 
 import math.Vector3;
 
-public class Transform {
+public class Transform extends Component {
 	
 	Vector3 position;
 	Vector3 rotation;
