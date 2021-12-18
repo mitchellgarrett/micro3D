@@ -5,18 +5,25 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import component.MeshComponent;
+import component.SpriteComponent;
 import component.Transform;
 import entity.Camera;
 import entity.Entity;
 import entity.Scene;
+import entity.Time;
 import math.Mathf;
 import math.Matrix4;
 import math.Vector3;
 import mesh.Mesh;
 import mesh.Triangle;
+import mesh.Vertex;
 
 public class Renderer {
 	
@@ -59,16 +66,34 @@ public class Renderer {
 	}
 	
 	void renderEntity(Entity entity) {
+		Transform t = entity.transform();
 		MeshComponent mc = entity.getComponent(MeshComponent.class);
 		if (mc != null) {
-			Transform t = entity.transform();
 			renderMesh(mc.mesh(), t.position(), t.rotation(), t.scale());
+		} else {
+			SpriteComponent sc = entity.getComponent(SpriteComponent.class);
+			if (sc != null) {
+				renderSprite(sc.sprite(), t.position(), t.rotation(), t.scale());
+			}
 		}
+	}
+	
+	void renderSprite(Sprite sprite, Vector3 position, Vector3 rotation, Vector3 scale) {
+		Matrix4 rot = Mathf.rotationMatrix(rotation);
+		
+		Vector3 pos = position.copy().mul(projection).add(windowOffset).mul(windowScale);
+		
+		graphics.drawImage(sprite.image, Math.round(pos.x()),  Math.round(pos.y()), 128, 128, null);
+		
+		/*for (int y = 0; y < sprite.image.getHeight(null); y++) {
+			
+		}*/
 	}
 	
 	void renderMesh(Mesh mesh, Vector3 position, Vector3 rotation, Vector3 scale) {
 		Matrix4 rot = Mathf.rotationMatrix(rotation);
 		
+		List<Triangle> triangles = new ArrayList<Triangle>();
 		for (int t = 0; t < mesh.indices.size(); t += 3) {
 			int i0 = mesh.indices.get(t + 0);
 			int i1 = mesh.indices.get(t + 1);
@@ -86,19 +111,57 @@ public class Renderer {
 			n = Mathf.normal(v0, v1, v2);
 			if (n.dot(v0.copy().sub(camera.transform().position())) < 0) {
 				
-				v0.mul(projection).add(windowOffset).mul(windowScale);
-				v1.mul(projection).add(windowOffset).mul(windowScale);
-				v2.mul(projection).add(windowOffset).mul(windowScale);
 				
-				graphics.drawLine(Math.round(v0.x()), Math.round(v0.y()), Math.round(v1.x()), Math.round(v1.y()));
-				graphics.drawLine(Math.round(v1.x()), Math.round( v1.y()), Math.round(v2.x()), Math.round( v2.y()));
-				graphics.drawLine(Math.round(v2.x()), Math.round(v2.y()), Math.round(v0.x()), Math.round(v0.y()));
+				
+				triangles.add(new Triangle(new Vertex(v0), new Vertex(v1), new Vertex(v2)));
+				
+				
+				//fillTriangle(v0, v1, v2, color);
+				//drawTriangle(v0, v1, v2, Color.white);
 			}
+		}
+		
+		triangles.sort(new Comparator<Triangle>() {
+
+			@Override
+			public int compare(Triangle a, Triangle b) {
+				float za = (a.a().position.z() + a.b().position.z() + a.c().position.z()) / 3f;
+				float zb = (b.a().position.z() + b.b().position.z() + b.c().position.z()) / 3f;
+				if (za < zb) return -1;
+				if (zb > za) return 1;
+				return 0;
+			}
+		});
+		
+		for (Triangle t : triangles) {
+			Vector3 lightDir = new Vector3(0, 0, -1).normalize();
+			Vector3 n = Mathf.normal(t.a().position, t.b().position, t.c().position);
+			float d = Mathf.clamp(n.dot(lightDir), 0, 1);
+			Color color = new Color(d, d, d);
+			
+			t.a().position.mul(projection).add(windowOffset).mul(windowScale);
+			t.b().position.mul(projection).add(windowOffset).mul(windowScale);
+			t.c().position.mul(projection).add(windowOffset).mul(windowScale);
+			
+			fillTriangle(t.a().position, t.b().position, t.c().position, color);
 		}
 	}
 	
+	void fillTriangle(Vector3 a, Vector3 b, Vector3 c, Color color) {
+		int[] xs = new int[] { Math.round(a.x()), Math.round(b.x()), Math.round(c.x()) };
+		int[] ys = new int[] { Math.round(a.y()), Math.round(b.y()), Math.round(c.y()) };
+		graphics.setColor(color);
+		graphics.fillPolygon(xs, ys, 3);
+	}
+	
+	void drawTriangle(Vector3 a, Vector3 b, Vector3 c, Color color) {
+		graphics.setColor(color);
+		graphics.drawLine(Math.round(a.x()), Math.round(a.y()), Math.round(b.x()), Math.round(b.y()));
+		graphics.drawLine(Math.round(b.x()), Math.round(b.y()), Math.round(c.x()), Math.round(c.y()));
+		graphics.drawLine(Math.round(c.x()), Math.round(c.y()), Math.round(a.x()), Math.round(a.y()));
+	}
+	
 	void renderTriangle(Graphics g, Triangle t) {
-		
 		Vector3 trans = new Vector3(0, 0, 10);
 		Matrix4 rot = new Matrix4();
 		rot.identity();
@@ -151,6 +214,8 @@ public class Renderer {
 			resetDepth();
 			graphics.clearRect(0, 0, window.getWidth(), window.getHeight());
 			graphics.setColor(Color.WHITE);
+			
+			graphics.drawString(Float.toString(Time.getFPS()), 10, 50);
 			
 			camera = scene.getCamera();
 			camera.setAspect(window.getAspectRatio());

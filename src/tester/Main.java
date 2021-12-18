@@ -32,6 +32,11 @@ public class Main {
 		scene.addEntity(entity);
 		scene.addEntity(entity.copy());
 		
+		Entity sprite = new Entity();
+		sprite.addComponent(new SpriteComponent(Sprite.load("res/dirt.png")));
+		sprite.transform().position().z(5);
+		scene.addEntity(sprite);
+		
 		Time.setTime(0);
 		while (window.isOpen()) {
 			Time.update();

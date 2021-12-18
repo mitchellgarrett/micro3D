@@ -13,6 +13,12 @@ public class Mathf {
 	
 	public static float sqrt(float v) { return (float) Math.sqrt(v); }
 	
+	public static float clamp(float val, float min, float max) {
+		if (val < min) return min;
+		if (val > max) return max;
+		return val;
+	}
+	
 	public static Vector3 normal(Vector3 a, Vector3 b, Vector3 c) {
 		return b.copy().sub(a).cross(c.copy().sub(a)).normalize();
 	}
