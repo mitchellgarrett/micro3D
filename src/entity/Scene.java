@@ -1,21 +1,21 @@
 package entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Scene {
 	
 	Camera camera;
-	List<Entity> entities;
+	Set<Entity> entities;
 	
 	public Scene(Camera camera) {
-		entities = new ArrayList<Entity>();
+		entities = new HashSet<Entity>();
 		setCamera(camera);
 	}
 	
 	public Camera getCamera() { return camera; }
 	public void setCamera(Camera camera) { this.camera = camera; }
 	
-	public void addEntity(Entity entity) { entities.add(entity); }
-	public List<Entity> getEntities() { return entities; }
+	public boolean addEntity(Entity entity) { return entities.add(entity); }
+	public Set<Entity> getEntities() { return entities; }
 }

@@ -30,4 +30,23 @@ public class Entity {
 	}
 	
 	public Transform transform() { return transform; }
+	
+	public Entity copy() {
+		Entity copy = new Entity();
+		copy.transform.position(transform.position().copy());
+		copy.transform.rotation(transform.rotation().copy());
+		copy.transform.scale(transform.scale().copy());
+		for (Component component : components.values()) {
+			copy.addComponent(component.copy());
+		}
+		return copy;
+	}
+	
+	public static Entity instantiate() {
+		return new Entity();
+	}
+	
+	public static Entity instantiate(Entity entity) {
+		return entity.copy();
+	}
 }

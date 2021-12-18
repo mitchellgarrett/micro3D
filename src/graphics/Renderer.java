@@ -5,9 +5,10 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.List;
+import java.util.Set;
 
 import component.MeshComponent;
+import component.Transform;
 import entity.Camera;
 import entity.Entity;
 import entity.Scene;
@@ -24,6 +25,10 @@ public class Renderer {
 	Image buffer;
 	float[][] zBuffer;
 	Graphics graphics;
+	
+	Camera camera;
+	Vector3 windowOffset, windowScale;
+	Matrix4 projection;
 	
 	public Renderer(Window window) {
 		this.window = window;
@@ -53,14 +58,16 @@ public class Renderer {
 		graphics = buffer.getGraphics();
 	}
 	
-	void renderMesh(Camera camera, Mesh mesh) {
-		camera.setAspect(window.getAspectRatio());
-		Matrix4 pm = camera.getProjectionMatrix();
-		
-		Vector3 offset = new Vector3(1, 1, 0);
-		Vector3 scale = new Vector3(window.getWidth() * 0.5f, window.getHeight() * 0.5f, 1);
-		
-		Vector3 trans = new Vector3(0, 0, 10);
+	void renderEntity(Entity entity) {
+		MeshComponent mc = entity.getComponent(MeshComponent.class);
+		if (mc != null) {
+			Transform t = entity.transform();
+			renderMesh(mc.mesh(), t.position(), t.rotation(), t.scale());
+		}
+	}
+	
+	void renderMesh(Mesh mesh, Vector3 position, Vector3 rotation, Vector3 scale) {
+		Matrix4 rot = Mathf.rotationMatrix(rotation);
 		
 		for (int t = 0; t < mesh.indices.size(); t += 3) {
 			int i0 = mesh.indices.get(t + 0);
@@ -71,30 +78,26 @@ public class Renderer {
 			Vector3 v1 = mesh.vertices.get(i1).copy();
 			Vector3 v2 = mesh.vertices.get(i2).copy();
 			
-			v0.add(trans);
-			v1.add(trans);
-			v2.add(trans);
+			v0.mul(rot).add(position);
+			v1.mul(rot).add(position);
+			v2.mul(rot).add(position);
 			
 			Vector3 n = mesh.normals.get(i0);
 			n = Mathf.normal(v0, v1, v2);
 			if (n.dot(v0.copy().sub(camera.transform().position())) < 0) {
 				
-				v0.mul(pm).add(offset).mul(scale);
-				v1.mul(pm).add(offset).mul(scale);
-				v2.mul(pm).add(offset).mul(scale);
+				v0.mul(projection).add(windowOffset).mul(windowScale);
+				v1.mul(projection).add(windowOffset).mul(windowScale);
+				v2.mul(projection).add(windowOffset).mul(windowScale);
 				
-				graphics.drawLine((int) v0.x(), (int) v0.y(), (int) v1.x(), (int) v1.y());
-				graphics.drawLine((int) v1.x(), (int) v1.y(), (int) v2.x(), (int) v2.y());
-				graphics.drawLine((int) v2.x(), (int) v2.y(), (int) v0.x(), (int) v0.y());
+				graphics.drawLine(Math.round(v0.x()), Math.round(v0.y()), Math.round(v1.x()), Math.round(v1.y()));
+				graphics.drawLine(Math.round(v1.x()), Math.round( v1.y()), Math.round(v2.x()), Math.round( v2.y()));
+				graphics.drawLine(Math.round(v2.x()), Math.round(v2.y()), Math.round(v0.x()), Math.round(v0.y()));
 			}
 		}
 	}
 	
-	void renderTriangle(Graphics g, Camera camera, Triangle t) {
-		camera.setAspect(window.getAspectRatio());
-		Matrix4 pm = camera.getProjectionMatrix();
-		Vector3 offset = new Vector3(1, 1, 0);
-		Vector3 scale = new Vector3(window.getWidth() * 0.5f, window.getHeight() * 0.5f, 1);
+	void renderTriangle(Graphics g, Triangle t) {
 		
 		Vector3 trans = new Vector3(0, 0, 10);
 		Matrix4 rot = new Matrix4();
@@ -120,9 +123,9 @@ public class Renderer {
 			//Vector3 light = new Vector3(0, 0, -1).normalize();
 			//float dp = light.dot(normal);
 			
-			a.mul(pm).add(offset).mul(scale);
-			b.mul(pm).add(offset).mul(scale);
-			c.mul(pm).add(offset).mul(scale);
+			a.mul(projection).add(windowOffset).mul(windowScale);
+			b.mul(projection).add(windowOffset).mul(windowScale);
+			c.mul(projection).add(windowOffset).mul(windowScale);
 			
 			// Wireframe
 			g.drawLine((int) a.x(), (int) a.y(), (int) b.x(), (int) b.y());
@@ -149,13 +152,16 @@ public class Renderer {
 			graphics.clearRect(0, 0, window.getWidth(), window.getHeight());
 			graphics.setColor(Color.WHITE);
 			
-			Camera camera = scene.getCamera();
-			List<Entity> entities = scene.getEntities();
+			camera = scene.getCamera();
+			camera.setAspect(window.getAspectRatio());
+			projection = camera.getProjectionMatrix();
+			
+			windowOffset = new Vector3(1, 1, 0);
+			windowScale = new Vector3(window.getWidth() * 0.5f, window.getHeight() * 0.5f, 1);
+			
+			Set<Entity> entities = scene.getEntities();
 			for (Entity entity : entities) {
-				MeshComponent mc = entity.getComponent(MeshComponent.class);
-				if (mc != null) {
-					renderMesh(camera, mc.mesh());
-				}
+				renderEntity(entity);
 			}
 			
 			window.frame.getGraphics().drawImage(buffer, 0, 0, window.frame);

@@ -3,6 +3,7 @@ package graphics;
 import javax.swing.JFrame;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -25,12 +26,6 @@ public class Window {
 			}
 		});
 		
-		// Fullscreen
-		//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		
-		// Borderless
-		//frame.setUndecorated(true);
-
 		frame.setBackground(Color.BLACK);
 		frame.setForeground(Color.WHITE);
 		
@@ -51,8 +46,19 @@ public class Window {
 		}
 	}
 	
+	public void setFullscreen(boolean fullscreen) { 
+		if (fullscreen) frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		else frame.setExtendedState(Frame.NORMAL);
+	}
+	
+	public void setBorderless(boolean borderless) { 
+		frame.dispose();
+		frame.setUndecorated(borderless); 
+		frame.setVisible(true);
+	}
+	
 	public int getWidth() { return frame.getWidth(); }
 	public int getHeight() { return frame.getHeight(); }
 	public float getAspectRatio() { return (float) getWidth() / getHeight(); }
-	public void setIcon(Image icon) { frame.setIconImage(icon); }
+	public void setIcon(Sprite icon) { frame.setIconImage(icon.image); }
 }

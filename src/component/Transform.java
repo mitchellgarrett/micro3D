@@ -14,6 +14,15 @@ public class Transform extends Component {
 		scale = new Vector3(1, 1, 1);
 	}
 	
+	@Override
+	public Component copy() {
+		Transform copy = new Transform();
+		copy.position = position.copy();
+		copy.rotation = rotation.copy();
+		copy.scale = scale.copy();
+		return copy;
+	}
+	
 	public Vector3 position() { return position; }
 	public Vector3 rotation() { return rotation; }
 	public Vector3 scale() { return scale; }

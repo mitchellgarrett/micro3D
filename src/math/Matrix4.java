@@ -18,4 +18,17 @@ public class Matrix4 {
 		set(3, 3, 1);
 		return this;
 	}
+	
+	public Matrix4 mul(Matrix4 val) {
+		float[][] result = new float[4][4];
+		for (int r = 0; r < 4; ++r) {
+			for (int c = 0; c < 4; ++c) {
+				for (int i = 0; i < 4; ++i) {
+					result[r][c] += get(r, i) * val.get(i, c);
+				}
+			}
+		}
+		values = result;
+		return this;
+	}
 }
