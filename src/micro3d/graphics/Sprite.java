@@ -1,4 +1,4 @@
-package graphics;
+package micro3d.graphics;
 
 import java.awt.Image;
 import java.io.File;

@@ -1,4 +1,4 @@
-package math;
+package micro3d.math;
 
 public class Matrix4 {
 	

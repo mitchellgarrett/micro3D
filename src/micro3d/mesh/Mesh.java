@@ -1,10 +1,10 @@
-package mesh;
+package micro3d.mesh;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import math.Vector3;
+import micro3d.math.Vector3;
 
 public class Mesh {
 	

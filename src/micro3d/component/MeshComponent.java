@@ -1,6 +1,6 @@
-package component;
+package micro3d.component;
 
-import mesh.Mesh;
+import micro3d.mesh.Mesh;
 
 public class MeshComponent extends Component {
 	

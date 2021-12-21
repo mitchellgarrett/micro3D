@@ -1,4 +1,4 @@
-package math;
+package micro3d.math;
 
 public class Vector4 {
 
@@ -40,6 +40,13 @@ public class Vector4 {
 	
 	public Vector4 copy() {
 		return new Vector4(this);
+	}
+	
+	public Vector4 neg() {
+		values[0] *= -1;
+		values[1] *= -1;
+		values[2] *= -1;
+		return this;
 	}
 	
 	public Vector4 mul(Matrix4 mat) {

@@ -1,4 +1,4 @@
-package graphics;
+package micro3d.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,19 +11,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import component.MeshComponent;
-import component.SpriteComponent;
-import component.Transform;
-import entity.Camera;
-import entity.Entity;
-import entity.Scene;
-import entity.Time;
-import math.Mathf;
-import math.Matrix4;
-import math.Vector3;
-import mesh.Mesh;
-import mesh.Triangle;
-import mesh.Vertex;
+import micro3d.component.MeshComponent;
+import micro3d.component.SpriteComponent;
+import micro3d.component.Transform;
+import micro3d.entity.Camera;
+import micro3d.entity.Entity;
+import micro3d.entity.Scene;
+import micro3d.entity.Time;
+import micro3d.math.Mathf;
+import micro3d.math.Matrix4;
+import micro3d.math.Vector3;
+import micro3d.mesh.Mesh;
+import micro3d.mesh.Triangle;
+import micro3d.mesh.Vertex;
 
 public class Renderer {
 	
@@ -107,14 +107,12 @@ public class Renderer {
 			v1.mul(rot).add(position);
 			v2.mul(rot).add(position);
 			
+			// Back-face culling
 			Vector3 n = mesh.normals.get(i0);
 			n = Mathf.normal(v0, v1, v2);
 			if (n.dot(v0.copy().sub(camera.transform().position())) < 0) {
-				
-				
-				
+
 				triangles.add(new Triangle(new Vertex(v0), new Vertex(v1), new Vertex(v2)));
-				
 				
 				//fillTriangle(v0, v1, v2, color);
 				//drawTriangle(v0, v1, v2, Color.white);
@@ -122,7 +120,6 @@ public class Renderer {
 		}
 		
 		triangles.sort(new Comparator<Triangle>() {
-
 			@Override
 			public int compare(Triangle a, Triangle b) {
 				float za = (a.a().position.z() + a.b().position.z() + a.c().position.z()) / 3f;
@@ -144,6 +141,7 @@ public class Renderer {
 			t.c().position.mul(projection).add(windowOffset).mul(windowScale);
 			
 			fillTriangle(t.a().position, t.b().position, t.c().position, color);
+			//drawTriangle(t.a().position, t.b().position, t.c().position, Color.white);
 		}
 	}
 	

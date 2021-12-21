@@ -1,15 +1,12 @@
-package entity;
+package micro3d.entity;
 
-import component.Transform;
-import math.Mathf;
-import math.Matrix4;
+import micro3d.math.Mathf;
+import micro3d.math.Matrix4;
 
 public class Camera extends Entity {
 	
 	float aspect, fov;
 	float near, far;
-	
-	Transform transform;
 	
 	public Camera(float aspect, float fov, float near, float far) {
 		super();

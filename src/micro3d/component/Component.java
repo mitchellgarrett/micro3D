@@ -1,6 +1,6 @@
-package component;
+package micro3d.component;
 
-import entity.Entity;
+import micro3d.entity.Entity;
 
 public abstract class Component {
 	

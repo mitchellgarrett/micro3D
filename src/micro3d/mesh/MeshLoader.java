@@ -1,4 +1,4 @@
-package mesh;
+package micro3d.mesh;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import math.Vector3;
+import micro3d.math.Vector3;
 
 public class MeshLoader {
 

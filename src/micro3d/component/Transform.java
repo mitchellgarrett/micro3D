@@ -1,6 +1,6 @@
-package component;
+package micro3d.component;
 
-import math.Vector3;
+import micro3d.math.Vector3;
 
 public class Transform extends Component {
 	

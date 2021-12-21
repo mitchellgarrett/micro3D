@@ -1,4 +1,4 @@
-package math;
+package micro3d.math;
 
 public class Vector3 {
 
@@ -59,6 +59,13 @@ public class Vector3 {
 	
 	public Vector3 normalize() {
 		div(length());
+		return this;
+	}
+	
+	public Vector3 neg() {
+		values[0] *= -1;
+		values[1] *= -1;
+		values[2] *= -1;
 		return this;
 	}
 	

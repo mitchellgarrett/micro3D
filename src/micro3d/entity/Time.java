@@ -1,4 +1,4 @@
-package entity;
+package micro3d.entity;
 
 public class Time {
 	

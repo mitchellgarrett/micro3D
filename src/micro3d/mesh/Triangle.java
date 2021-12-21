@@ -1,4 +1,4 @@
-package mesh;
+package micro3d.mesh;
 
 public class Triangle {
 	

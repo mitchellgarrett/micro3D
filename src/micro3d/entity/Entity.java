@@ -1,10 +1,10 @@
-package entity;
+package micro3d.entity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import component.Component;
-import component.Transform;
+import micro3d.component.Component;
+import micro3d.component.Transform;
 
 public class Entity {
 

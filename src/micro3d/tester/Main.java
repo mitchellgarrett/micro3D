@@ -1,10 +1,10 @@
-package tester;
+package micro3d.tester;
 
-import entity.*;
-import graphics.*;
-import math.Vector3;
-import mesh.*;
-import component.*;
+import micro3d.component.*;
+import micro3d.entity.*;
+import micro3d.graphics.*;
+import micro3d.math.Vector3;
+import micro3d.mesh.*;
 
 public class Main {
 
@@ -18,6 +18,7 @@ public class Main {
 		Renderer renderer = new Renderer(window);
 		
 		Camera camera = new Camera(window.getAspectRatio(), 60, 0, 100);
+		camera.transform().position().y(0);
 		Scene scene = new Scene(camera);
 		
 		Mesh mesh = MeshLoader.loadMesh("res/cube.obj");

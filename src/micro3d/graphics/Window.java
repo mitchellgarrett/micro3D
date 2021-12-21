@@ -1,4 +1,4 @@
-package graphics;
+package micro3d.graphics;
 
 import javax.swing.JFrame;
 

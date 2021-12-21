@@ -1,6 +1,6 @@
-package component;
+package micro3d.component;
 
-import graphics.Sprite;
+import micro3d.graphics.Sprite;
 
 public class SpriteComponent extends Component {
 	
