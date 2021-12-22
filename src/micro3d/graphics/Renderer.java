@@ -162,17 +162,17 @@ public class Renderer {
 		g.drawLine(x, y, x, y);
 	}
 	
-	void resetDepth() {
+	void resetDepthBuffer() {
 		for (int r = 0; r < zBuffer.length; ++r) {
 			for (int c = 0; c < zBuffer[r].length; ++c) {
-				zBuffer[r][c]= Float.POSITIVE_INFINITY; 
+				zBuffer[r][c] = Float.POSITIVE_INFINITY; 
 			}
 		}
 	}
 	
 	public void render(Scene scene) {
 		if (window.isRunning) {
-			resetDepth();
+			resetDepthBuffer();
 			graphics.clearRect(0, 0, window.getWidth(), window.getHeight());
 			graphics.setColor(Color.WHITE);
 			
