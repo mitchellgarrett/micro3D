@@ -56,4 +56,78 @@ public class Mathf {
 		
 		return x.mul(y).mul(z);
 	}
+	
+	public static Matrix4 pointAtMatrix(Vector3 position, Vector3 target, Vector3 up)  {
+		
+		Vector3 forward = position.copy().sub(target).normalize();
+		up = up.copy().sub(forward.copy().mul(up.dot(forward))).normalize();
+		Vector3 right = up.copy().cross(forward).normalize();
+		
+		Matrix4 mat = new Matrix4();
+		
+		mat.set(0, 0, forward.x());
+		mat.set(0, 1, forward.y());
+		mat.set(0, 2, forward.z());
+		
+		mat.set(1, 0, right.x());
+		mat.set(1, 1, right.y());
+		mat.set(1, 2, right.z());
+		
+		mat.set(2, 0, up.x());
+		mat.set(2, 1, up.y());
+		mat.set(2, 2, up.z());
+		
+		mat.set(3, 0, position.x());
+		mat.set(3, 1, position.y());
+		mat.set(3, 2, position.z());
+		mat.set(3, 3, 1);
+		
+		return mat;
+	}
+	
+	public static Matrix4 lookAtMatrix(Vector3 position, Vector3 target, Vector3 up)  {
+		
+		Vector3 forward = position.copy().sub(target).normalize();
+		//up = up.copy().cross(forward).normalize();
+		up = up.copy().sub(forward.copy().mul(up.dot(forward))).normalize();
+		Vector3 right = up.copy().cross(forward).normalize();
+		
+		Matrix4 mat = new Matrix4();
+		
+		/*mat.set(0, 0, forward.x());
+		mat.set(1, 0, forward.y());
+		mat.set(2, 0, forward.z());
+		
+		mat.set(0, 1, right.x());
+		mat.set(1, 1, right.y());
+		mat.set(2, 1, right.z());
+		
+		mat.set(0, 2, up.x());
+		mat.set(1, 2, up.y());
+		mat.set(2, 2, up.z());
+		
+		mat.set(3, 0, -position.dot(forward));
+		mat.set(3, 1, -position.dot(right));
+		mat.set(3, 2, -position.dot(up));
+		mat.set(3, 3, 1);*/
+		
+		mat.set(0, 0, right.x());
+		mat.set(1, 0, right.y());
+		mat.set(2, 0, right.z());
+		
+		mat.set(0, 1, up.x());
+		mat.set(1, 1, up.y());
+		mat.set(2, 1, up.z());
+		
+		mat.set(0, 2, forward.x());
+		mat.set(1, 2, forward.y());
+		mat.set(2, 2, forward.z());
+		
+		mat.set(3, 0, -position.dot(right));
+		mat.set(3, 1, -position.dot(up));
+		mat.set(3, 2, -position.dot(forward));
+		mat.set(3, 3, 1);
+		
+		return mat;
+	}
 }

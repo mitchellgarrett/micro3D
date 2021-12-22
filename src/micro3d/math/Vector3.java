@@ -69,10 +69,24 @@ public class Vector3 {
 		return this;
 	}
 	
+	public Vector3 add(float x, float y, float z) {
+		values[0] += x;
+		values[1] += y;
+		values[2] += z;
+		return this;
+	}
+	
 	public Vector3 add(Vector3 val) {
 		values[0] += val.x();
 		values[1] += val.y();
 		values[2] += val.z();
+		return this;
+	}
+	
+	public Vector3 sub(float x, float y, float z) {
+		values[0] -= x;
+		values[1] -= y;
+		values[2] -= z;
 		return this;
 	}
 	

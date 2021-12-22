@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,7 +34,7 @@ public class Renderer {
 	
 	Camera camera;
 	Vector3 windowOffset, windowScale;
-	Matrix4 projection;
+	Matrix4 view, projection;
 	
 	public Renderer(Window window) {
 		this.window = window;
@@ -136,12 +135,12 @@ public class Renderer {
 			float d = Mathf.clamp(n.dot(lightDir), 0, 1);
 			Color color = new Color(d, d, d);
 			
-			t.a().position.mul(projection).add(windowOffset).mul(windowScale);
-			t.b().position.mul(projection).add(windowOffset).mul(windowScale);
-			t.c().position.mul(projection).add(windowOffset).mul(windowScale);
+			t.a().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
+			t.b().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
+			t.c().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
 			
-			fillTriangle(t.a().position, t.b().position, t.c().position, color);
-			//drawTriangle(t.a().position, t.b().position, t.c().position, Color.white);
+			//fillTriangle(t.a().position, t.b().position, t.c().position, color);
+			drawTriangle(t.a().position, t.b().position, t.c().position, Color.white);
 		}
 	}
 	
@@ -157,42 +156,6 @@ public class Renderer {
 		graphics.drawLine(Math.round(a.x()), Math.round(a.y()), Math.round(b.x()), Math.round(b.y()));
 		graphics.drawLine(Math.round(b.x()), Math.round(b.y()), Math.round(c.x()), Math.round(c.y()));
 		graphics.drawLine(Math.round(c.x()), Math.round(c.y()), Math.round(a.x()), Math.round(a.y()));
-	}
-	
-	void renderTriangle(Graphics g, Triangle t) {
-		Vector3 trans = new Vector3(0, 0, 10);
-		Matrix4 rot = new Matrix4();
-		rot.identity();
-		
-		Vector3 a = new Vector3(t.a().position).mul(rot).add(trans);
-		Vector3 b = new Vector3(t.b().position).mul(rot).add(trans);
-		Vector3 c = new Vector3(t.c().position).mul(rot).add(trans);
-		
-		Vector3 normal, line1, line2;
-		
-		line1 = new Vector3(b).sub(a);
-		line2 = new Vector3(c).sub(a);
-		
-		normal = line1.cross(line2).normalize();
-		
-		if (
-				normal.x() * (a.x() - camera.transform().position().x()) +
-				normal.y() * (a.y() - camera.transform().position().y()) +
-				normal.z() * (a.z() - camera.transform().position().z()) < 0
-				) {
-		
-			//Vector3 light = new Vector3(0, 0, -1).normalize();
-			//float dp = light.dot(normal);
-			
-			a.mul(projection).add(windowOffset).mul(windowScale);
-			b.mul(projection).add(windowOffset).mul(windowScale);
-			c.mul(projection).add(windowOffset).mul(windowScale);
-			
-			// Wireframe
-			g.drawLine((int) a.x(), (int) a.y(), (int) b.x(), (int) b.y());
-			g.drawLine((int) b.x(), (int) b.y(), (int) c.x(), (int) c.y());
-			g.drawLine((int) c.x(), (int) c.y(), (int) a.x(), (int) a.y());
-		}
 	}
 	
 	void drawPixel(Graphics g, int x, int y) {
@@ -217,6 +180,12 @@ public class Renderer {
 			
 			camera = scene.getCamera();
 			camera.setAspect(window.getAspectRatio());
+			
+			Vector3 lookDir = new Vector3(0, 0, 1);
+			Vector3 up = new Vector3(0, 1, 0);
+			Vector3 target = camera.transform().position().copy().add(lookDir);
+			
+			view = Mathf.lookAtMatrix(camera.transform().position().copy(), target, up);
 			projection = camera.getProjectionMatrix();
 			
 			windowOffset = new Vector3(1, 1, 0);
