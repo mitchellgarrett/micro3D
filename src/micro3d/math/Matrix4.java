@@ -31,4 +31,54 @@ public class Matrix4 {
 		values = result;
 		return this;
 	}
+	
+	public Matrix4 rotateX(float angle) {
+		float cos = Mathf.cos(Mathf.toRadians(angle));
+		float sin = Mathf.sin(Mathf.toRadians(angle));
+		
+		Matrix4 rot = new Matrix4();
+		rot.identity();
+		rot.set(1, 1, cos);
+		rot.set(1, 2, -sin);
+		rot.set(2, 1, sin);
+		rot.set(2, 2, cos);
+		
+		return mul(rot);
+	}
+	
+	public Matrix4 rotateY(float angle) {
+		float cos = Mathf.cos(Mathf.toRadians(angle));
+		float sin = Mathf.sin(Mathf.toRadians(angle));
+		
+		Matrix4 rot = new Matrix4();
+		rot.identity();
+		rot.set(0, 0, cos);
+		rot.set(0, 2, sin);
+		rot.set(2, 0, -sin);
+		rot.set(2, 2, cos);
+		
+		return mul(rot);
+	}
+	
+	public Matrix4 rotateZ(float angle) {
+		float cos = Mathf.cos(Mathf.toRadians(angle));
+		float sin = Mathf.sin(Mathf.toRadians(angle));
+		
+		Matrix4 rot = new Matrix4();
+		rot.identity();
+		rot.set(0, 0, cos);
+		rot.set(0, 1, -sin);
+		rot.set(1, 0, sin);
+		rot.set(1, 1, cos);
+		
+		return mul(rot);
+	}
+	
+	public Matrix4 rotate(Vector3 rotation) {
+		return rotateX(rotation.x()).rotateY(rotation.y()).rotateZ(rotation.z());
+	}
+	
+	public static Matrix4 rotatation(Vector3 rotation) {
+		return new Matrix4().identity().rotate(rotation);
+	}
 }

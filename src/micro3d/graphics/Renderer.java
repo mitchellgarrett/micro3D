@@ -2,12 +2,10 @@ package micro3d.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.awt.image.BufferedImage;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import micro3d.component.MeshComponent;
@@ -28,9 +26,10 @@ public class Renderer {
 	
 	Window window;
 	
-	Image buffer;
-	float[][] zBuffer;
+	BufferedImage buffer;
+	float[][] depthBuffer;
 	Graphics graphics;
+	PriorityQueue<Triangle> triangles;
 	
 	Camera camera;
 	Vector3 windowOffset, windowScale;
@@ -59,8 +58,8 @@ public class Renderer {
 	}
 	
 	void setBuffers() {
-		buffer = window.frame.createImage(window.getWidth(), window.getHeight());
-		zBuffer = new float[window.getHeight()][window.getWidth()];
+		buffer = new BufferedImage(window.getWidth(), window.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		depthBuffer = new float[window.getHeight()][window.getWidth()];
 		graphics = buffer.getGraphics();
 	}
 	
@@ -78,7 +77,7 @@ public class Renderer {
 	}
 	
 	void renderSprite(Sprite sprite, Vector3 position, Vector3 rotation, Vector3 scale) {
-		Matrix4 rot = Mathf.rotationMatrix(rotation);
+		Matrix4 rot = Matrix4.rotatation(rotation);
 		
 		Vector3 pos = position.copy().mul(projection).add(windowOffset).mul(windowScale);
 		
@@ -90,9 +89,8 @@ public class Renderer {
 	}
 	
 	void renderMesh(Mesh mesh, Vector3 position, Vector3 rotation, Vector3 scale) {
-		Matrix4 rot = Mathf.rotationMatrix(rotation);
+		Matrix4 rot = Matrix4.rotatation(rotation);
 		
-		List<Triangle> triangles = new ArrayList<Triangle>();
 		for (int t = 0; t < mesh.indices.size(); t += 3) {
 			int i0 = mesh.indices.get(t + 0);
 			int i1 = mesh.indices.get(t + 1);
@@ -110,37 +108,46 @@ public class Renderer {
 			Vector3 n = mesh.normals.get(i0);
 			n = Mathf.normal(v0, v1, v2);
 			if (n.dot(v0.copy().sub(camera.transform().position())) < 0) {
-
 				triangles.add(new Triangle(new Vertex(v0), new Vertex(v1), new Vertex(v2)));
-				
-				//fillTriangle(v0, v1, v2, color);
-				//drawTriangle(v0, v1, v2, Color.white);
 			}
 		}
-		
-		triangles.sort(new Comparator<Triangle>() {
-			@Override
-			public int compare(Triangle a, Triangle b) {
-				float za = (a.a().position.z() + a.b().position.z() + a.c().position.z()) / 3f;
-				float zb = (b.a().position.z() + b.b().position.z() + b.c().position.z()) / 3f;
-				if (za < zb) return -1;
-				if (zb > za) return 1;
-				return 0;
-			}
-		});
-		
-		for (Triangle t : triangles) {
-			Vector3 lightDir = new Vector3(0, 0, -1).normalize();
-			Vector3 n = Mathf.normal(t.a().position, t.b().position, t.c().position);
-			float d = Mathf.clamp(n.dot(lightDir), 0, 1);
-			Color color = new Color(d, d, d);
-			
+	}
+	
+	void rasterizeTriangles() {
+		while (!triangles.isEmpty()) {
+			Triangle t = triangles.remove();
 			t.a().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
 			t.b().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
 			t.c().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
 			
-			//fillTriangle(t.a().position, t.b().position, t.c().position, color);
+			fillTriangle(t.a().position, t.b().position, t.c().position, Color.black);
 			drawTriangle(t.a().position, t.b().position, t.c().position, Color.white);
+		}
+	}
+	
+	void rasterizeTriangle(Triangle triangle) {
+		int[] xs = new int[] { Math.round(triangle.a().position.x()), Math.round(triangle.b().position.x()), Math.round(triangle.c().position.x()) };
+		int[] ys = new int[] { Math.round(triangle.a().position.y()), Math.round(triangle.b().position.y()), Math.round(triangle.c().position.y()) };
+		
+		int xmin = Math.max(0, Math.min(xs[0], Math.min(xs[1], xs[2])));
+		int xmax = Math.min(window.getWidth() - 1, Math.max(xs[0], Math.max(xs[1], xs[2])));
+		int ymin = Math.max(0, Math.min(ys[0], Math.min(ys[1], ys[2])));
+		int ymax = Math.min(window.getHeight() - 1, Math.max(ys[0], Math.max(ys[1], ys[2])));
+		
+		for (int y = ymin; y <= ymax; ++y) {
+			for (int x = xmin; x <= xmax; ++x) {
+				Vector3 point = new Vector3(x, y, 0);
+				Vector3 bary = Mathf.bary(point, triangle.a().position, triangle.b().position, triangle.c().position);
+				
+				if (bary.x() < 0 || bary.x() > 1 || bary.y() < 0 || bary.y() > 1 || bary.z() < 0 || bary.z() > 1) continue;
+				
+				float z = bary.x() * triangle.a().position.z() + bary.y() * triangle.b().position.z() + bary.z() * triangle.c().position.z();
+				if (z > depthBuffer[y][x]) continue;
+				
+				depthBuffer[y][x] = z;
+				Color color = new Color(bary.x(), bary.y(), bary.z());
+				setPixel(x, y, color);
+			}
 		}
 	}
 	
@@ -158,14 +165,18 @@ public class Renderer {
 		graphics.drawLine(Math.round(c.x()), Math.round(c.y()), Math.round(a.x()), Math.round(a.y()));
 	}
 	
-	void drawPixel(Graphics g, int x, int y) {
-		g.drawLine(x, y, x, y);
+	void setPixel(int x, int y) {
+		buffer.setRGB(x, y, graphics.getColor().getRGB());
+	}
+	
+	void setPixel(int x, int y, Color color) {
+		buffer.setRGB(x, y, color.getRGB());
 	}
 	
 	void resetDepthBuffer() {
-		for (int r = 0; r < zBuffer.length; ++r) {
-			for (int c = 0; c < zBuffer[r].length; ++c) {
-				zBuffer[r][c] = Float.POSITIVE_INFINITY; 
+		for (int r = 0; r < depthBuffer.length; ++r) {
+			for (int c = 0; c < depthBuffer[r].length; ++c) {
+				depthBuffer[r][c] = Float.POSITIVE_INFINITY; 
 			}
 		}
 	}
@@ -183,18 +194,23 @@ public class Renderer {
 			
 			Vector3 lookDir = new Vector3(0, 0, 1);
 			Vector3 up = new Vector3(0, 1, 0);
+			
+			lookDir.mul(Matrix4.rotatation(camera.transform().rotation()));
 			Vector3 target = camera.transform().position().copy().add(lookDir);
 			
-			view = Mathf.lookAtMatrix(camera.transform().position().copy(), target, up);
+			view = Mathf.lookAt(camera.transform().position().copy(), target, up);
 			projection = camera.getProjectionMatrix();
 			
 			windowOffset = new Vector3(1, 1, 0);
 			windowScale = new Vector3(window.getWidth() * 0.5f, window.getHeight() * 0.5f, 1);
 			
+			triangles = new PriorityQueue<Triangle>();
 			Set<Entity> entities = scene.getEntities();
 			for (Entity entity : entities) {
 				renderEntity(entity);
 			}
+			
+			rasterizeTriangles();
 			
 			window.frame.getGraphics().drawImage(buffer, 0, 0, window.frame);
 		}

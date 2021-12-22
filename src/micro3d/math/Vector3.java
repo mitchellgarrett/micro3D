@@ -136,6 +136,18 @@ public class Vector3 {
 		return this;
 	}
 	
+	public static Vector3 forward() {
+		return new Vector3(0, 0, 1);
+	}
+	
+	public static Vector3 up() {
+		return new Vector3(0, 1, 0);
+	}
+	
+	public static Vector3 right() {
+		return new Vector3(1, 0, 0);
+	}
+	
 	@Override
 	public String toString() {
 		return "(" + x() + ", " + y() + ", " + z() + ")";

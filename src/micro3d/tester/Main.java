@@ -34,50 +34,12 @@ public class Main {
 		
 		scene.addEntity(entity);
 		scene.addEntity(entity.copy());
+		entity.transform().position().z(5);
 		
 		Entity sprite = new Entity();
 		sprite.addComponent(new SpriteComponent(Sprite.load("res/dirt.png")));
 		sprite.transform().position().z(5);
-		scene.addEntity(sprite);
-		
-		window.addListener(new KeyListener() {
-			
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				switch (e.getKeyChar()) {
-				case 'w':
-					camera.transform().position().add(0, Time.getDeltaTime() * 10, 0);
-					break;
-				case 's':
-					camera.transform().position().add(0, Time.getDeltaTime() * -10, 0);
-					break;
-				case 'd':
-					camera.transform().position().add(Time.getDeltaTime() * 10, 0, 0);
-					break;
-				case 'a':
-					camera.transform().position().add(Time.getDeltaTime() * -10, 0, 0);
-					break;
-
-				default:
-					break;
-				}
-				
-				
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		//scene.addEntity(sprite);
 		
 		Time.setTime(0);
 		while (window.isOpen()) {
@@ -85,17 +47,18 @@ public class Main {
 			Input.update();
 			
 			float speed = 10f;
+			float rotSpeed = 90f;
 			if (Input.getKey(KeyCode.W)) {
-				camera.transform().position().add(0, Time.getDeltaTime() * speed, 0);
+				camera.transform().position().add(camera.transform().forward().mul(Time.getDeltaTime() * speed));
 			}
 			if (Input.getKey(KeyCode.S)) {
-				camera.transform().position().add(0, Time.getDeltaTime() * -speed, 0);
+				camera.transform().position().add(camera.transform().forward().mul(Time.getDeltaTime() * -speed));
 			}
 			if (Input.getKey(KeyCode.D)) {
-				camera.transform().position().add(Time.getDeltaTime() * speed, 0, 0);
+				camera.transform().rotation().add(0, Time.getDeltaTime() * -rotSpeed, 0);
 			}
 			if (Input.getKey(KeyCode.A)) {
-				camera.transform().position().add(Time.getDeltaTime() * -speed, 0, 0);
+				camera.transform().rotation().add(0, Time.getDeltaTime() * rotSpeed, 0);
 			}
 			
 			entity.transform().position().add(new Vector3(Time.getDeltaTime() * 0.5f, 0, 0));

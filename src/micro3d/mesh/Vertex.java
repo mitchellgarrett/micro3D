@@ -9,4 +9,9 @@ public class Vertex {
 	public Vertex(Vector3 position) {
 		this.position = position;
 	}
+	
+	@Override
+	public String toString() {
+		return position.toString();
+	}
 }

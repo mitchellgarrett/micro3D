@@ -1,5 +1,6 @@
 package micro3d.component;
 
+import micro3d.math.Matrix4;
 import micro3d.math.Vector3;
 
 public class Transform extends Component {
@@ -21,6 +22,18 @@ public class Transform extends Component {
 		copy.rotation = rotation.copy();
 		copy.scale = scale.copy();
 		return copy;
+	}
+	
+	public Vector3 forward() {
+		return Vector3.forward().mul(Matrix4.rotatation(rotation));
+	}
+	
+	public Vector3 up() {
+		return Vector3.up().mul(Matrix4.rotatation(rotation));
+	}
+	
+	public Vector3 right() {
+		return Vector3.right().mul(Matrix4.rotatation(rotation));
 	}
 	
 	public Vector3 position() { return position; }
