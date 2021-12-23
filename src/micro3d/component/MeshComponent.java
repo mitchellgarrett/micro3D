@@ -2,7 +2,7 @@ package micro3d.component;
 
 import micro3d.mesh.Mesh;
 
-public class MeshComponent extends Component {
+public class MeshComponent extends RenderComponent {
 	
 	private Mesh mesh;
 	

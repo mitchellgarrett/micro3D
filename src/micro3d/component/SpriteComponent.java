@@ -2,7 +2,7 @@ package micro3d.component;
 
 import micro3d.graphics.Sprite;
 
-public class SpriteComponent extends Component {
+public class SpriteComponent extends RenderComponent {
 	
 	private Sprite sprite;
 	

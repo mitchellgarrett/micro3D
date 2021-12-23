@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import micro3d.component.Component;
+import micro3d.component.RenderComponent;
 import micro3d.component.Transform;
 
 public class Entity {
@@ -19,6 +20,13 @@ public class Entity {
 	}
 	
 	public <T extends Component> T addComponent(T component) {
+		if (components.containsKey(component.getClass())) return null;
+		components.put(component.getClass(), component);
+		component.entity(this);
+		return component;
+	}
+	
+	public <T extends RenderComponent> T addComponent(T component) {
 		if (components.containsKey(component.getClass())) return null;
 		components.put(component.getClass(), component);
 		component.entity(this);

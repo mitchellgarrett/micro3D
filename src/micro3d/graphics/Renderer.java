@@ -9,6 +9,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import micro3d.component.MeshComponent;
+import micro3d.component.RenderComponent;
 import micro3d.component.SpriteComponent;
 import micro3d.component.Transform;
 import micro3d.entity.Camera;
@@ -54,6 +55,7 @@ public class Renderer {
 			public void componentShown(ComponentEvent e) { }
 		});
 		
+		triangles = new PriorityQueue<Triangle>();
 		setBuffers();
 	}
 	
@@ -65,14 +67,11 @@ public class Renderer {
 	
 	void renderEntity(Entity entity) {
 		Transform t = entity.transform();
-		MeshComponent mc = entity.getComponent(MeshComponent.class);
-		if (mc != null) {
-			renderMesh(mc.mesh(), t.position(), t.rotation(), t.scale());
-		} else {
-			SpriteComponent sc = entity.getComponent(SpriteComponent.class);
-			if (sc != null) {
-				renderSprite(sc.sprite(), t.position(), t.rotation(), t.scale());
-			}
+		RenderComponent rc;
+		if ((rc = entity.getComponent(MeshComponent.class)) != null) {
+			renderMesh(((MeshComponent)rc).mesh(), t.position(), t.rotation(), t.scale());
+		} else if ((rc = entity.getComponent(SpriteComponent.class)) != null) {
+			renderSprite(((SpriteComponent)rc).sprite(), t.position(), t.rotation(), t.scale());
 		}
 	}
 	
@@ -108,19 +107,23 @@ public class Renderer {
 			Vector3 n = mesh.normals.get(i0);
 			n = Mathf.normal(v0, v1, v2);
 			if (n.dot(v0.copy().sub(camera.transform().position())) < 0) {
+				v0.mul(view);
+				v1.mul(view);
+				v2.mul(view);
+				
 				triangles.add(new Triangle(new Vertex(v0), new Vertex(v1), new Vertex(v2)));
 			}
 		}
 	}
 	
-	void rasterizeTriangles() {
+	void rasterizeTriangles() {		
 		while (!triangles.isEmpty()) {
 			Triangle t = triangles.remove();
-			t.a().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
-			t.b().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
-			t.c().position.mul(view).mul(projection).add(windowOffset).mul(windowScale);
+			t.a().position.mul(projection).add(windowOffset).mul(windowScale);
+			t.b().position.mul(projection).add(windowOffset).mul(windowScale);
+			t.c().position.mul(projection).add(windowOffset).mul(windowScale);
 			
-			fillTriangle(t.a().position, t.b().position, t.c().position, Color.black);
+			//fillTriangle(t.a().position, t.b().position, t.c().position, Color.black);
 			drawTriangle(t.a().position, t.b().position, t.c().position, Color.white);
 		}
 	}
@@ -183,7 +186,7 @@ public class Renderer {
 	
 	public void render(Scene scene) {
 		if (window.isRunning) {
-			resetDepthBuffer();
+			//resetDepthBuffer();
 			graphics.clearRect(0, 0, window.getWidth(), window.getHeight());
 			graphics.setColor(Color.WHITE);
 			
@@ -204,7 +207,7 @@ public class Renderer {
 			windowOffset = new Vector3(1, 1, 0);
 			windowScale = new Vector3(window.getWidth() * 0.5f, window.getHeight() * 0.5f, 1);
 			
-			triangles = new PriorityQueue<Triangle>();
+			triangles.clear();
 			Set<Entity> entities = scene.getEntities();
 			for (Entity entity : entities) {
 				renderEntity(entity);
